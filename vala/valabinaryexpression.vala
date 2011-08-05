@@ -157,7 +157,6 @@ public class Vala.BinaryExpression : Expression {
 
 			var local = new LocalVariable (context.analyzer.bool_type.copy (), get_temp_name (), null, source_reference);
 			var decl = new DeclarationStatement (local, source_reference);
-			decl.check (context);
 
 			var right_stmt = new ExpressionStatement (new Assignment (new MemberAccess.simple (local.name, right.source_reference), right, AssignmentOperator.SIMPLE, right.source_reference), right.source_reference);
 
@@ -179,6 +178,8 @@ public class Vala.BinaryExpression : Expression {
 			insert_statement (context.analyzer.insert_block, decl);
 			insert_statement (context.analyzer.insert_block, if_stmt);
 
+			decl.check (context);
+
 			if (!if_stmt.check (context)) {
 				error = true;
 				return false;
@@ -186,9 +187,10 @@ public class Vala.BinaryExpression : Expression {
 
 			var ma = new MemberAccess.simple (local.name, source_reference);
 			ma.target_type = target_type;
-			ma.check (context);
 
 			parent_node.replace_expression (this, ma);
+
+			ma.check (context);
 
 			return true;
 		}
@@ -242,9 +244,10 @@ public class Vala.BinaryExpression : Expression {
 			}
 
 			var temp_access = SemanticAnalyzer.create_temp_access (local, target_type);
-			temp_access.check (context);
 
 			parent_node.replace_expression (this, temp_access);
+
+			temp_access.check (context);
 
 			return true;
 		}
