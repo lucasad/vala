@@ -153,6 +153,8 @@ public class Vala.ForeachStatement : Block {
 
 		checked = true;
 
+		owner = context.analyzer.get_current_symbol (parent_node).scope;
+
 		// analyze collection expression first, used for type inference
 		if (!collection.check (context)) {
 			// ignore inner error
@@ -352,15 +354,9 @@ public class Vala.ForeachStatement : Block {
 
 		element_variable = new LocalVariable (type_reference, variable_name, null, source_reference);
 
-		body.scope.add (variable_name, element_variable);
-
 		body.add_local_variable (element_variable);
 		element_variable.active = true;
 		element_variable.checked = true;
-
-		// analyze body
-		owner = context.analyzer.current_symbol.scope;
-		context.analyzer.current_symbol = this;
 
 		// call add_local_variable to check for shadowed variable
 		add_local_variable (element_variable);
@@ -371,8 +367,6 @@ public class Vala.ForeachStatement : Block {
 		foreach (LocalVariable local in get_local_variables ()) {
 			local.active = false;
 		}
-
-		context.analyzer.current_symbol = context.analyzer.current_symbol.parent_symbol;
 
 		collection_variable = new LocalVariable (collection_type.copy (), "%s_collection".printf (variable_name));
 

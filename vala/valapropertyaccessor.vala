@@ -126,10 +126,6 @@ public class Vala.PropertyAccessor : Subroutine {
 			return false;
 		}
 
-		var old_symbol = context.analyzer.current_symbol;
-
-		context.analyzer.current_symbol = this;
-
 		if (prop.source_type == SourceFileType.SOURCE) {
 			if (body == null && !prop.interface_only && !prop.is_abstract) {
 				/* no accessor body specified, insert default body */
@@ -169,8 +165,6 @@ public class Vala.PropertyAccessor : Subroutine {
 				}
 			}
 		}
-
-		context.analyzer.current_symbol = old_symbol;
 
 		return !error;
 	}

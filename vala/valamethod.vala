@@ -629,14 +629,6 @@ public class Vala.Method : Subroutine {
 			return false;
 		}
 
-		var old_source_file = context.analyzer.current_source_file;
-		var old_symbol = context.analyzer.current_symbol;
-
-		if (source_reference != null) {
-			context.analyzer.current_source_file = source_reference.file;
-		}
-		context.analyzer.current_symbol = this;
-
 		return_type.check (context);
 
 		var init_attr = get_attribute ("ModuleInit");
@@ -702,7 +694,7 @@ public class Vala.Method : Subroutine {
 			body.check (context);
 		}
 
-		if (context.analyzer.current_struct != null) {
+		if (context.analyzer.get_current_struct (this) != null) {
 			if (is_abstract || is_virtual || overrides) {
 				error = true;
 				Report.error (source_reference, "A struct member `%s' cannot be marked as override, virtual, or abstract".printf (get_full_name ()));
@@ -715,9 +707,6 @@ public class Vala.Method : Subroutine {
 			Report.error (source_reference, "Private member `%s' cannot be marked as override, virtual, or abstract".printf (get_full_name ()));
 			return false;
 		}
-
-		context.analyzer.current_source_file = old_source_file;
-		context.analyzer.current_symbol = old_symbol;
 
 		if (!external_package && !overrides && !hides && get_hidden_member () != null) {
 			Report.warning (source_reference, "%s hides inherited method `%s'. Use the `new' keyword if hiding was intentional".printf (get_full_name (), get_hidden_member ().get_full_name ()));
