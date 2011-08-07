@@ -550,7 +550,7 @@ public class Vala.GAsyncModule : GtkModule {
 		var simple_async_result_cast = new CCodeFunctionCall (new CCodeIdentifier ("G_SIMPLE_ASYNC_RESULT"));
 		simple_async_result_cast.add_argument (new CCodeIdentifier ("_res_"));
 
-		if (m.get_error_types ().size > 0) {
+		if (m.tree_can_fail) {
 			// propagate error from async method
 			var propagate_error = new CCodeFunctionCall (new CCodeIdentifier ("g_simple_async_result_propagate_error"));
 			propagate_error.add_argument (simple_async_result_cast);

@@ -565,7 +565,9 @@ public class Vala.GDBusClientModule : GDBusModule {
 			timeout.add_argument (gdbusproxy);
 
 			// register errors
-			foreach (var error_type in m.get_error_types ()) {
+			var error_types = new ArrayList<DataType> ();
+			m.get_error_types (error_types);
+			foreach (var error_type in error_types) {
 				var errtype = (ErrorType) error_type;
 				if (errtype.error_domain != null) {
 					ccode.add_expression (new CCodeIdentifier (get_ccode_upper_case_name (errtype.error_domain)));

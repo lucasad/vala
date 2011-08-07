@@ -97,6 +97,11 @@ public class Vala.Assignment : Expression {
 		return false;
 	}
 
+	public override void get_error_types (Collection<DataType> collection, SourceReference? source_reference = null) {
+		left.get_error_types (collection, source_reference);
+		right.get_error_types (collection, source_reference);
+	}
+
 	public override bool check (CodeContext context) {
 		if (checked) {
 			return !error;
@@ -439,9 +444,6 @@ public class Vala.Assignment : Expression {
 		} else {
 			value_type = null;
 		}
-
-		add_error_types (left.get_error_types ());
-		add_error_types (right.get_error_types ());
 
 		return !error;
 	}
