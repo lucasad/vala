@@ -148,112 +148,6 @@ public class Vala.BinaryExpression : Expression {
 
 		checked = true;
 
-		var insert_block = context.analyzer.get_current_block (this);
-
-		// some expressions are not in a block,
-		// for example, expressions in method contracts
-		if (context.analyzer.get_current_symbol (this) is Block
-		    && (operator == BinaryOperator.AND || operator == BinaryOperator.OR)) {
-			// convert conditional expression into if statement
-			// required for flow analysis and exception handling
-
-			var local = new LocalVariable (context.analyzer.bool_type.copy (), get_temp_name (), null, source_reference);
-			var decl = new DeclarationStatement (local, source_reference);
-
-			var right_stmt = new ExpressionStatement (new Assignment (new MemberAccess.simple (local.name, right.source_reference), right, AssignmentOperator.SIMPLE, right.source_reference), right.source_reference);
-
-			var stmt = new ExpressionStatement (new Assignment (new MemberAccess.simple (local.name, left.source_reference), new BooleanLiteral ((operator == BinaryOperator.OR), left.source_reference), AssignmentOperator.SIMPLE, left.source_reference), left.source_reference);
-
-			var true_block = new Block (source_reference);
-			var false_block = new Block (source_reference);
-
-			if (operator == BinaryOperator.AND) {
-				true_block.add_statement (right_stmt);
-				false_block.add_statement (stmt);
-			} else {
-				true_block.add_statement (stmt);
-				false_block.add_statement (right_stmt);
-			}
-
-			var if_stmt = new IfStatement (left, true_block, false_block, source_reference);
-
-			insert_statement (insert_block, decl);
-			insert_statement (insert_block, if_stmt);
-
-			decl.check (context);
-
-			if (!if_stmt.check (context)) {
-				error = true;
-				return false;
-			}
-
-			var ma = new MemberAccess.simple (local.name, source_reference);
-			ma.target_type = target_type;
-
-			parent_node.replace_expression (this, ma);
-
-			ma.check (context);
-
-			return true;
-		}
-
-		if (operator == BinaryOperator.COALESCE) {
-			if (!left.check (context)) {
-				error = true;
-				return false;
-			}
-
-			if (!right.check (context)) {
-				error = true;
-				return false;
-			}
-
-			DataType local_type = null;
-			if (left.value_type != null) {
-				local_type = left.value_type.copy ();
-				if (right.value_type != null && right.value_type.value_owned) {
-					// value owned if either left or right is owned
-					local_type.value_owned = true;
-				}
-			} else if (right.value_type != null) {
-				local_type = right.value_type.copy ();
-			}
-		
-			var local = new LocalVariable (local_type, get_temp_name (), left, source_reference);
-			var decl = new DeclarationStatement (local, source_reference);
-
-			var right_stmt = new ExpressionStatement (new Assignment (new MemberAccess.simple (local.name, right.source_reference), right, AssignmentOperator.SIMPLE, right.source_reference), right.source_reference);
-
-			var true_block = new Block (source_reference);
-
-			true_block.add_statement (right_stmt);
-
-			var cond = new BinaryExpression (BinaryOperator.EQUALITY, new MemberAccess.simple (local.name, left.source_reference), new NullLiteral (source_reference), source_reference);
-
-			var if_stmt = new IfStatement (cond, true_block, null, source_reference);
-
-			insert_statement (insert_block, decl);
-			insert_statement (insert_block, if_stmt);
-
-			if (!decl.check (context)) {
-				error = true;
-				return false;
-			}
-
-			if (!if_stmt.check (context)) {
-				error = true;
-				return false;
-			}
-
-			var temp_access = SemanticAnalyzer.create_temp_access (local, target_type);
-
-			parent_node.replace_expression (this, temp_access);
-
-			temp_access.check (context);
-
-			return true;
-		}
-
 		if (!left.check (context) || !right.check (context)) {
 			/* if there were any errors in inner expressions, skip type check */
 			error = true;
@@ -288,7 +182,11 @@ public class Vala.BinaryExpression : Expression {
 		right.target_type = right.value_type.copy ();
 		right.target_type.value_owned = false;
 
-		if (left.value_type.data_type == context.analyzer.string_type.data_type
+		if (operator == BinaryOperator.COALESCE) {
+			left.target_type.nullable = true;
+			right.target_type = left.target_type.copy ();
+			value_type = left.target_type.copy ();
+		} else if (left.value_type.data_type == context.analyzer.string_type.data_type
 		    && operator == BinaryOperator.PLUS) {
 			// string concatenation
 
@@ -481,15 +379,9 @@ public class Vala.BinaryExpression : Expression {
 					error = true;
 					return false;
 				}
-
-				var contains_call = new MethodCall (new MemberAccess (right, "contains", source_reference), source_reference);
-				contains_call.add_argument (left);
-				parent_node.replace_expression (this, contains_call);
-				return contains_call.check (context);
 			}
 			
 			value_type = context.analyzer.bool_type;
-			
 		} else {
 			assert_not_reached ();
 		}
