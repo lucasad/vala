@@ -286,6 +286,30 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 		}
 	}
 
+	int get_yield_count (Method m) {
+		int yield_count = 0;
+		var traverse = new TraverseVisitor ((n) => {
+				if (n is Method && n != m) {
+					return TraverseStatus.STOP;
+				} else if (n is MethodCall) {
+					var expr = (MethodCall) n;
+					if (expr.is_yield_expression) {
+						yield_count++;
+					}
+				} else if (n is YieldStatement) {
+					yield_count++;
+				} else if (n is ObjectCreationExpression) {
+					var expr = (ObjectCreationExpression) n;
+					if (expr.is_yield_expression) {
+						yield_count++;
+					}
+				}
+				return TraverseStatus.CONTINUE;
+			});
+		m.accept (traverse);
+		return yield_count;
+	}
+
 	/**
 	 * This function generates the code the given method. If the method is
 	 * a constructor, _construct is generated, unless it's variadic, in which
@@ -464,7 +488,9 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 					ccode.add_case (new CCodeConstant ("0"));
 					ccode.add_goto ("_state_0");
 
-					for (int state = 1; state <= m.yield_count; state++) {
+					var yield_count = get_yield_count (m);
+
+					for (int state = 1; state <= yield_count; state++) {
 						ccode.add_case (new CCodeConstant (state.to_string ()));
 						ccode.add_goto ("_state_%d".printf (state));
 					}

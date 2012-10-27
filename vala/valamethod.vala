@@ -172,8 +172,6 @@ public class Vala.Method : Subroutine {
 
 	public bool is_async_callback { get; set; }
 
-	public int yield_count { get; set; }
-
 	private List<Parameter> parameters = new ArrayList<Parameter> ();
 	private List<Expression> preconditions;
 	private List<Expression> postconditions;

@@ -75,8 +75,6 @@ public class Vala.YieldStatement : BaseStatement {
 			error = yield_expression.error;
 		}
 
-		context.analyzer.get_current_method (this).yield_count++;
-
 		return !error;
 	}
 

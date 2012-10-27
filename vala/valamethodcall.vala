@@ -615,7 +615,6 @@ public class Vala.MethodCall : Expression {
 					error = true;
 					Report.error (source_reference, "yield expression not available outside async method");
 				}
-				current_method.yield_count++;
 			}
 			if (m.returns_floating_reference) {
 				value_type.floating_reference = true;
