@@ -72,10 +72,6 @@ public class Vala.PostfixExpression : Expression {
 		return false;
 	}
 
-	public override void get_used_variables (Collection<Variable> collection) {
-		inner.get_used_variables (collection);
-	}
-
 	public override void replace_expression (Expression old_node, Expression new_node) {
 		if (inner == old_node) {
 			inner = new_node;

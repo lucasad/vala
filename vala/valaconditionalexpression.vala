@@ -100,12 +100,6 @@ public class Vala.ConditionalExpression : Expression {
 		return condition.is_pure () && true_expression.is_pure () && false_expression.is_pure ();
 	}
 
-	public override void get_used_variables (Collection<Variable> collection) {
-		condition.get_used_variables (collection);
-		true_expression.get_used_variables (collection);
-		false_expression.get_used_variables (collection);
-	}
-
 	public override string to_string () {
 		return "%s ? %s : %s".printf (condition.to_string (), true_expression.to_string (), false_expression.to_string ());
 	}
