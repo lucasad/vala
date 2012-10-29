@@ -181,6 +181,7 @@ TESTS = \
 	asynchronous/bug654337.vala \
 	asynchronous/bug661961.vala \
 	asynchronous/closures.vala \
+	asynchronous/yield.vala \
 	dbus/basic-types.test \
 	dbus/arrays.test \
 	dbus/structs.test \
