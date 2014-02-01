@@ -757,4 +757,23 @@ public class Vala.MethodCall : Expression {
 
 		codegen.visit_expression (this);
 	}
+
+	public override string to_string () {
+		var b = new StringBuilder ();
+		b.append_c ('(');
+		b.append (call.to_string ());
+		b.append_c ('(');
+
+		bool first = true;
+		foreach (var expr in argument_list) {
+			if (!first) {
+				b.append (", ");
+			}
+			b.append (expr.to_string ());
+			first = true;
+		}
+		b.append ("))");
+
+		return b.str;
+	}
 }
