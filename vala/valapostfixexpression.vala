@@ -150,4 +150,9 @@ public class Vala.PostfixExpression : Expression {
 
 		codegen.visit_expression (this);
 	}
+
+	public override string to_string () {
+		var op = increment ? "++" : "--";
+		return @"($inner$op)";
+	}
 }
