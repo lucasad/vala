@@ -770,7 +770,7 @@ public class Vala.MethodCall : Expression {
 				b.append (", ");
 			}
 			b.append (expr.to_string ());
-			first = true;
+			first = false;
 		}
 		b.append ("))");
 

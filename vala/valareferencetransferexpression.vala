@@ -116,4 +116,8 @@ public class Vala.ReferenceTransferExpression : Expression {
 
 		codegen.visit_expression (this);
 	}
+
+	public override string to_string () {
+		return "(owned) "+inner.to_string ();
+	}
 }

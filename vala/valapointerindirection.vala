@@ -106,4 +106,8 @@ public class Vala.PointerIndirection : Expression {
 
 		codegen.visit_expression (this);
 	}
+
+	public override string to_string () {
+		return "(*"+inner.to_string()+")";
+	}
 }
