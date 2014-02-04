@@ -25,5 +25,6 @@ namespace Config {
 	[CCode (cheader_filename = "version.h")]
 	public const string BUILD_VERSION;
 	public const string PACKAGE_DATADIR;
+	public const string PACKAGE_LIBDIR;
 	public const string PACKAGE_SUFFIX;
 }

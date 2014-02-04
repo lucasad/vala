@@ -4,7 +4,9 @@ AM_CPPFLAGS = \
 	$(COVERAGE_CFLAGS) \
 	-I$(top_srcdir)/gee \
 	$(GLIB_CFLAGS) \
+	$(GMODULE_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(pkgdatadir)\" \
+	-DPACKAGE_LIBDIR=\"$(pkglibdir)\"	\
 	$(NULL)
 
 BUILT_SOURCES = vala.vala.stamp
@@ -176,12 +178,13 @@ valainclude_HEADERS = \
 	$(NULL)
 
 vala.vapi vala.vala.stamp: $(libvalacore_la_VALASOURCES)
-	$(VALA_V)$(VALAC) $(COVERAGE_VALAFLAGS) $(VALAFLAGS) -C --vapidir $(srcdir)/../vapi --pkg gobject-2.0 --vapidir $(srcdir)/../gee --pkg gee --pkg config -H vala.h --library vala $^
+	$(VALA_V)$(VALAC) $(COVERAGE_VALAFLAGS) $(VALAFLAGS) -C --vapidir $(srcdir)/../vapi --pkg gobject-2.0 --pkg gmodule-2.0 --vapidir $(srcdir)/../gee --pkg gee --pkg config -H vala.h --library vala $^
 	@touch $@
 
 libvalacore_la_LIBADD = \
 	$(COVERAGE_LIBS) \
 	$(GLIB_LIBS) \
+	$(GMODULE_LIBS) \
 	../gee/libgee.la \
 	$(NULL)
 
