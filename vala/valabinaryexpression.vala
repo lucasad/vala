@@ -141,6 +141,11 @@ public class Vala.BinaryExpression : Expression {
 		return left.is_non_null () && right.is_non_null ();
 	}
 
+	public override void get_error_types (Collection<DataType> collection, SourceReference? source_reference = null) {
+		left.get_error_types (collection, source_reference);
+		right.get_error_types (collection, source_reference);
+	}
+	
 	public override bool check (CodeContext context) {
 		if (checked) {
 			return !error;

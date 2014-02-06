@@ -78,6 +78,10 @@ public class Vala.PostfixExpression : Expression {
 		}
 	}
 
+	public override void get_error_types (Collection<DataType> collection, SourceReference? source_reference = null) {
+		inner.get_error_types (collection, source_reference);
+	}
+
 	public override bool check (CodeContext context) {
 		if (checked) {
 			return !error;

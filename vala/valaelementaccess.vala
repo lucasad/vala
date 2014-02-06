@@ -110,6 +110,13 @@ public class Vala.ElementAccess : Expression {
 		return container.is_pure ();
 	}
 
+	public override void get_error_types (Collection<DataType> collection, SourceReference? source_reference = null) {
+		container.get_error_types (collection, source_reference);
+		foreach (Expression e in indices) {
+			e.get_error_types (collection, source_reference);
+		}
+	}
+
 	public override bool check (CodeContext context) {
 		if (checked) {
 			return !error;

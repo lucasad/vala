@@ -411,6 +411,10 @@ public class Vala.ObjectCreationExpression : Expression {
 			var m = (Method) symbol_reference;
 			m.get_error_types (collection, source_reference);
 		}
+
+		foreach (Expression expr in argument_list) {
+			expr.get_error_types (collection, source_reference);
+		}
 	}
 
 	public override void emit (CodeGenerator codegen) {
