@@ -603,7 +603,7 @@ public class Vala.FlowAnalyzer : CodeVisitor {
 
 		// condition
 		current_block.add_node (stmt.condition);
-
+		stmt.condition.accept (this);
 		handle_errors (stmt.condition);
 
 		// true block
@@ -653,7 +653,7 @@ public class Vala.FlowAnalyzer : CodeVisitor {
 		// condition
 		current_block.add_node (stmt.expression);
 		var condition_block = current_block;
-
+		stmt.expression.accept (this);
 		handle_errors (stmt.expression);
 
 		bool has_default_label = false;
@@ -745,6 +745,7 @@ public class Vala.FlowAnalyzer : CodeVisitor {
 
 		// condition
 		loop_block.add_node (stmt.condition);
+		stmt.condition.accept (this);
 		handle_errors (stmt.condition);
 
 		if (always_false (stmt.condition)) {
@@ -1193,7 +1194,7 @@ public class Vala.FlowAnalyzer : CodeVisitor {
 	public override void visit_expression (Expression expr) {
 		// lambda expression and conditional expression are handled separately
 		// an expression can be unreachable due to a conditional expression
-		if (!(expr is LambdaExpression) && !(expr is ConditionalExpression) && !unreachable (expr)) {
+		if (!(expr is LambdaExpression) && !(expr is ConditionalExpression) && !(expr is BinaryExpression) && !unreachable (expr)) {
 			expr.accept_children (this);
 		}
 	}
@@ -1240,6 +1241,43 @@ public class Vala.FlowAnalyzer : CodeVisitor {
 			if (last_false_block != null) {
 				last_false_block.connect (current_block);
 			}
+		}
+	}
+
+	public override void visit_binary_expression (BinaryExpression expr) {
+		if (unreachable (expr)) {
+			return;
+		}
+
+		if (expr.operator == BinaryOperator.AND || expr.operator == BinaryOperator.OR) {
+			// left block
+			current_block.add_node (expr.left);
+			expr.left.accept (this);
+
+			// right block
+			var last_block = current_block;
+			if ((expr.operator == BinaryOperator.AND && always_false (expr.left)) ||
+				(expr.operator == BinaryOperator.OR && always_true (expr.left))) {
+				mark_unreachable ();
+			} else {
+				current_block = new BasicBlock ();
+				last_block.connect (current_block);
+			}
+			expr.right.accept (this);
+			var last_right_block = current_block;
+
+			// reachable?
+			if (last_block != null || last_right_block != null) {
+				current_block = new BasicBlock ();
+				if (last_block != null) {
+					last_block.connect (current_block);
+				}
+				if (last_right_block != null) {
+					last_right_block.connect (current_block);
+				}
+			}
+		} else {
+			expr.accept_children (this);
 		}
 	}
 
