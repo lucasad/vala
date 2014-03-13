@@ -438,10 +438,13 @@ public class Vala.SemanticAnalyzer : CodeVisitor {
 				} else {
 					var invocation_expr = expr as MethodCall;
 					var object_creation_expr = expr as ObjectCreationExpression;
+					var old_parent = param.initializer.parent_node;
 					if (invocation_expr != null) {
 						invocation_expr.add_argument (param.initializer);
+						param.initializer.parent_node = old_parent;
 					} else if (object_creation_expr != null) {
 						object_creation_expr.add_argument (param.initializer);
+						param.initializer.parent_node = old_parent;
 					} else {
 						assert_not_reached ();
 					}

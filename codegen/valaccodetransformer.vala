@@ -323,7 +323,6 @@ public class Vala.CCodeTransformer : CodeTransformer {
 	}
 
 	public override void visit_expression (Expression expr) {
-		expr.accept_children (head);
 	}
 
 	public override void visit_method_call (MethodCall expr) {
@@ -345,7 +344,7 @@ public class Vala.CCodeTransformer : CodeTransformer {
 			}
 		}
 
-		expr.accept_children (head);
+		accept_method_call_children (expr);
 	}
 
 	public override void visit_conditional_expression (ConditionalExpression expr) {

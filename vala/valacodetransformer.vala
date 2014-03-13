@@ -275,6 +275,19 @@ public class Vala.CodeTransformer : CodeVisitor {
 		return file.file_type == SourceFileType.SOURCE || (context.header_filename != null && file.file_type == SourceFileType.FAST);
 	}
 
+	public void accept_method_call_children (MethodCall expr) {
+		/* Semantic analysis adds parameter initializers as arguments
+		 * this breaks a lot of assumption, and at the same time it's hard to fix in general.
+		 * Thus we make a little hack here to not accept such arguments. */
+		expr.call.accept (head);
+
+		foreach (Expression arg in expr.get_argument_list ()) {
+			if (arg.parent_node == expr) {
+				arg.accept (head);
+			}
+		}
+	}
+
 	public void accept_external (CodeNode node) {
 		if (node.source_reference != null) {
 			if (!is_visited (node) && !unit_generated.contains (node)) {
