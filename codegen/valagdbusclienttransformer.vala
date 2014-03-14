@@ -268,7 +268,7 @@ public class Vala.GDBusClientTransformer : GVariantTransformer {
 			b.open_if (expression (@"$result == null"));
 
 			b.open_try ();
-			statements (@"$result = call_sync (\"org.freedesktop.DBus.Properties.Get\", new Variant (\"(ss)\", \"$dbus_iface_name\", \"$dbus_name\"), GLib.DBusCallFlags.NONE, $timeout, null);");
+			statements (@"$result = call_sync (\"org.freedesktop.DBus.Properties.Get\", new GLib.Variant (\"(ss)\", \"$dbus_iface_name\", \"$dbus_name\"), GLib.DBusCallFlags.NONE, $timeout, null);");
 			b.add_catch_uncaught_error ();
 			b.close ();
 
@@ -284,7 +284,7 @@ public class Vala.GDBusClientTransformer : GVariantTransformer {
 			proxy_set = new PropertyAccessor (false, true, false, prop.set_accessor.value_type, null, prop.set_accessor.source_reference);
 			push_builder (new CodeBuilder.for_subroutine (proxy_set));
 			var variant = b.add_temp_declaration (data_type ("GLib.Variant"), expression ("value"));
-			statements (@"call_sync (\"org.freedesktop.DBus.Properties.Set\", new Variant (\"(ssv)\", \"$dbus_iface_name\", \"$dbus_name\", $variant), GLib.DBusCallFlags.NONE, $timeout, null);");
+			statements (@"call_sync (\"org.freedesktop.DBus.Properties.Set\", new GLib.Variant (\"(ssv)\", \"$dbus_iface_name\", \"$dbus_name\", $variant), GLib.DBusCallFlags.NONE, $timeout, null);");
 			pop_builder ();
 		}
 
