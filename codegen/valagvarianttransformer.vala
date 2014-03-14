@@ -501,7 +501,9 @@ public class Vala.GVariantTransformer : CCodeTransformer {
 			return;
 		}
 
-		push_builder (new CodeBuilder (context, expr.parent_statement, expr.source_reference));
+		var formal_target_type = copy_type (expr.formal_target_type);
+		var target_type = copy_type (expr.target_type);
+		begin_replace_expression (expr);
 		var type = expr.value_type;
 
 		BasicTypeInfo basic_type;
@@ -526,12 +528,9 @@ public class Vala.GVariantTransformer : CCodeTransformer {
 			Report.error (type.source_reference, "GVariant deserialization of type `%s' is not supported".printf (type.to_string ()));
 		}
 
-		context.analyzer.replaced_nodes.add (expr.inner);
-		expr.inner = result;
-		b.check (this);
-		pop_builder ();
-		expr.checked = false;
-		check (expr);
+		result.formal_target_type = formal_target_type;
+		result.target_type = target_type;
+		end_replace_expression (result);
 	}
 
 	public override void visit_expression (Expression expr) {

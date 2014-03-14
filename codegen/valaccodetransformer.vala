@@ -333,7 +333,7 @@ public class Vala.CCodeTransformer : CodeTransformer {
 				// can't handle errors in field initializers
 				Report.error (expr.source_reference, "Field initializers must not throw errors");
 			} else {
-				var formal_target_type = copy_type (expr.target_type);
+				var formal_target_type = copy_type (expr.formal_target_type);
 				var target_type = copy_type (expr.target_type);
 				begin_replace_expression (expr);
 
