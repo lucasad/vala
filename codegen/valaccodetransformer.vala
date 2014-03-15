@@ -223,8 +223,14 @@ public class Vala.CCodeTransformer : CodeTransformer {
 
 	public override void visit_foreach_statement (ForeachStatement stmt) {
 		begin_replace_statement (stmt);
-		
-		var collection = b.add_temp_declaration (stmt.collection.value_type, stmt.collection);
+
+		string collection;
+		var collection_type = copy_type (stmt.collection.value_type);
+		if (collection_type is ArrayType && (((ArrayType) collection_type).inline_allocated)) {
+			collection = stmt.collection.to_string ();
+		} else {
+			collection = b.add_temp_declaration (collection_type, stmt.collection);
+		}
 
 		stmt.body.remove_local_variable (stmt.element_variable);
 		stmt.element_variable.checked = false;
